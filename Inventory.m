@@ -257,5 +257,22 @@ classdef Inventory < handle
             tb = total_backlog(obj);
             obj.Log(end+1, :) = {obj.Time, obj.OnHand, tb, obj.RunningCost};
         end
+
+        % builds a bunch of example inventory object
+        function frac = fraction_orders_backlogged(obj)
+            NFulfilled = length(obj.Fulfilled);
+            NBacklogged = 0;
+            for j = 1:NFulfilled
+                x = obj.Fulfilled{j};
+                if x.Time > x.OriginalTime
+                    NBacklogged = NBacklogged + 1;
+                end
+            end
+            frac = NBacklogged / Nfulfilled;
+
+        end
+
+
     end
 end
+
