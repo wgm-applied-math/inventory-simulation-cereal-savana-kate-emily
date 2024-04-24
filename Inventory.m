@@ -191,13 +191,25 @@ classdef Inventory < handle
             % 
             % If a request has been placed but not yet fulfilled, no
             % additional request is placed.
-
+            
+           
             if ~obj.RequestPlaced && obj.OnHand <= obj.ReorderPoint
                 order_cost = obj.RequestCostPerBatch ...
                     + obj.RequestBatchSize * obj.RequestCostPerUnit;
                 obj.RunningCost = obj.RunningCost + order_cost;
+                 
+                LeadTimeProbability = rand();
+                if 0 < LeadTimeProbability <= 0.1
+	                AprilLeadTime = 2;
+                elseif 0.1 < LeadTimeProbability <= 0.2
+                    AprilLeadTime = 3;
+                elseif 0.2 < LeadTimeProbabillity <= 0.4
+	                AprilLeadTime = 4;
+                elseif 0.4 < LeadTimeProbability <= 0.3
+                    AprilLeadTime = 5;
+                end
                 arrival = ShipmentArrival( ...
-                    Time=floor(obj.Time+obj.RequestLeadTime), ...
+                    Time=floor(obj.Time+obj.AprilLeadTime), ...
                     Amount=obj.RequestBatchSize);
                 schedule_event(obj, arrival);
                 obj.RequestPlaced = true;
