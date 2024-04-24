@@ -258,6 +258,19 @@ classdef Inventory < handle
             obj.Log(end+1, :) = {obj.Time, obj.OnHand, tb, obj.RunningCost};
         end
 
+        function DelayTimes = fulfilled_order_delay_times(obj)
+            % iterate over obj.Fulfilled
+            NumFulfilled = length(obj.Fulfilled);
+
+            DelayTimes = zeros([NumFulfilled,1]);
+            for j = 1:NumFulfilled
+                x = obj.Fulfilled{j};
+                DelayTimes(j) = x.Time - x.OriginalTime;
+
+            end
+
+        end
+
         % builds a bunch of example inventory object
         function frac = fraction_orders_backlogged(obj)
             NFulfilled = length(obj.Fulfilled);
@@ -268,10 +281,21 @@ classdef Inventory < handle
                     NBacklogged = NBacklogged + 1;
                 end
             end
-            frac = NBacklogged / Nfulfilled;
+            frac = NBacklogged / NFulfilled;
 
         end
 
+        function frac = fraction_days_backlogged(obj)
+            NDays = length(obj.Log);
+            NBacklogged = 0;
+            for j = 1:NDays
+                x = obj.Log.Backlog(j);
+                if x > 0
+                    NBacklogged = NBacklogged + 1;
+                end
+            end
+            frac = NBacklogged / NDays;
+        end 
 
     end
 end
