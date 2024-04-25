@@ -23,10 +23,10 @@ ROP = 50;
 Q = 200;
 
 % How many samples of the simulation to run. NumSamples = 100
-NumSamples = 100;
+NumSamples = 10;
 
 % Run each sample for this many days. MaxTime=1000
-MaxTime = 1000;
+MaxTime = 100;
 
 %% Run simulation samples
 
@@ -35,6 +35,7 @@ rng("default");
 
 % Samples are stored in this cell array of Inventory objects
 InventorySamples = cell([NumSamples, 1]);
+
 
 % Run samples of the simulation.
 % Log entries are recorded at the end of every day
@@ -52,19 +53,6 @@ for SampleNum = 1:NumSamples
     InventorySamples{SampleNum} = inventory;
 end
 
-%% Collect daily backlog amounts
-
-BacklogAmountSamples = cell([NumSamples, 1]);
-
-for SampleNum = 1:NumSamples
-    inventory = InventorySamples{SampleNum};
-
-    bd = inventory.Log.Backlog > 0;
-    BacklogAmountSamples{SampleNum} = inventory.Log.Backlog(bd);
-
-end
-
-BacklogAmounts = vertcat(BacklogAmountSamples{:});
 
 %% Collect statistics
 
@@ -76,24 +64,8 @@ TotalCosts = cellfun(@(i) i.RunningCost, InventorySamples);
 meanDailyCost = mean(TotalCosts/MaxTime);
 fprintf("Mean daily cost: %f\n", meanDailyCost);
 
-PercentOrdersBacklogged = zeros([NumSamples,1]);
-
-for SampleNum = 1:NumSamples
-    inventory = InventorySamples{SampleNum};
-    PercentOrdersBacklogged(SampleNum) = fraction_orders_backlogged(inventory);
-end
-
-NonZeroBacklog = zeros([NumSamples,1]);
-
-for SampleNum = 1:NumSamples
-    inventory = InventorySamples{SampleNum};
-    NonZeroBacklog(SampleNum) = fraction_days_backlogged(inventory);
-end
-   
-
         
-%% Make picture for Daily Cost
-
+%% Daily Cost
 % Make a figure with one set of axes.
 fig = figure();
 t = tiledlayout(fig,1,1);
@@ -118,19 +90,27 @@ pause(2);
 % Save figure as a PDF file
 exportgraphics(fig, "Daily cost histogram.pdf");
 
-%% Make picture for fraction of orders that get backlogged
-% Make a figure with one set of axes.
+%% Fraction of orders that get backlogged
+
+FractionOrdersBacklogged = zeros([NumSamples,1]);
+
+for SampleNum = 1:NumSamples
+    inventory = InventorySamples{SampleNum};
+    FractionOrdersBacklogged(SampleNum) = fraction_orders_backlogged(inventory);
+end
+
+% create figure for fraction of orders that get backlogged
 fig = figure();
 t = tiledlayout(fig,1,1);
 ax = nexttile(t);
 
 % Histogram of the cost per day.
-h = histogram(ax, PercentOrdersBacklogged, Normalization="probability");
+h = histogram(ax, FractionOrdersBacklogged, Normalization="probability");
 
 % Add title and axis labels
 title(ax, "Fraction of Orders that get Backlogged");
-xlabel(ax, "Fraction of Orders Backlogged");
-ylabel(ax, "Probability");
+xlabel(ax, "Backlogged Orders");
+ylabel(ax, "Total Orders");
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -138,7 +118,15 @@ pause(2);
 % Save figure as a PDF file
 exportgraphics(fig, "Fraction of Orders that get Backlogged.pdf");
 
-%% Make picture for fraction of days with non-zero backlog
+%% Fraction of days with non-zero backlog
+
+NonZeroBacklog = zeros([NumSamples,1]);
+
+for SampleNum = 1:NumSamples
+    inventory = InventorySamples{SampleNum};
+    NonZeroBacklog(SampleNum) = fraction_days_backlogged(inventory);
+end
+
 
 % Make a figure with one set of axes.
 fig = figure();
@@ -159,3 +147,76 @@ pause(2);
 
 % Save figure as a PDF file
 exportgraphics(fig, "Non-zero Backlog Histogram.pdf");
+
+%% Delay time of order that get backlogged
+
+DelayTimeSamples = cell([NumSamples, 1]);
+
+for SampleNum = 1:NumSamples
+    inventory = InventorySamples{SampleNum};
+    dt = fulfilled_order_delay_time(inventory);
+    DelayTimeSamples{SampleNum} = dt(dt > 0);
+end
+
+DelayTimes = vertcat(DelayTimeSamples{:});
+
+% create figure for delay time of orders that get backlogged
+fig = figure();
+t = tiledlayout(fig,1,1);
+ax = nexttile(t);
+
+% Histogram of the cost per day.
+h = histogram(ax, DelayTimes, Normalization="probability", ...
+    BinWidth=5);
+
+% Add title and axis labels
+title(ax, "Delay Times of Backlogged Orders");
+xlabel(ax, "Delay Times");
+ylabel(ax, "Probability");
+
+% Fix the axis ranges
+ylim(ax, [0, 0.5]);
+xlim(ax, [240, 290]);
+
+% Wait for MATLAB to catch up.
+pause(2);
+
+% Save figure as a PDF file
+exportgraphics(fig, "Delay Time of Backlogged Orders.pdf");
+
+%% Total backlog amount
+
+BacklogAmountSamples = cell([NumSamples, 1]);
+
+for SampleNum = 1:NumSamples
+    inventory = InventorySamples{SampleNum};
+    bd = inventory.Log.Backlog > 0;
+    BacklogAmountSamples{SampleNum} = inventory.Log.Backlog(bd);
+
+end
+
+BacklogAmounts = vertcat(BacklogAmountSamples{:});
+
+% create figure for daily backlogged amounts
+fig = figure();
+t = tiledlayout(fig,1,1);
+ax = nexttile(t);
+
+% Histogram of the cost per day.
+h = histogram(ax, BacklogAmounts, Normalization="probability", ...
+    BinWidth=5);
+
+% Add title and axis labels
+title(ax, "Total Backlog Amounts");
+xlabel(ax, "Units of Cereal");
+ylabel(ax, "Probability");
+
+% Fix the axis ranges
+ylim(ax, [0, 0.5]);
+xlim(ax, [240, 290]);
+
+% Wait for MATLAB to catch up.
+pause(2);
+
+% Save figure as a PDF file
+exportgraphics(fig, "Total Backlog Amounts.pdf");
