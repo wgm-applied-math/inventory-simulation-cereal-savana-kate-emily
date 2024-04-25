@@ -37,11 +37,11 @@ classdef Inventory < handle
 
         % RequestBatchSize - When requesting a batch of material, how many
         % units to request in a batch.
-        RequestBatchSize = 200;
+        RequestBatchSize = 758;
 
         % ReorderPoint - When the amount of material on hand drops to this
         % many units, request another batch.
-        ReorderPoint = 50;
+        ReorderPoint = 141;
 
         % RequestLeadTime - When a batch is requested, it will be this
         % many time step before the batch arrives.
