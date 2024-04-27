@@ -17,16 +17,16 @@ L = 2;
 h = 0.05/7;
 
 % Reorder point.
-ROP = 50;
+ROP = 141;
 
 % Batch size.
-Q = 200;
+Q = 758;
 
 % How many samples of the simulation to run. NumSamples = 100
-NumSamples = 10;
+NumSamples = 100;
 
 % Run each sample for this many days. MaxTime=1000
-MaxTime = 100;
+MaxTime = 1000;
 
 %% Run simulation samples
 
@@ -81,8 +81,8 @@ xlabel(ax, "Dollars");
 ylabel(ax, "Probability");
 
 % Fix the axis ranges
-ylim(ax, [0, 0.5]);
-xlim(ax, [240, 290]);
+% ylim(ax, [0, 0.5]);
+% xlim(ax, [240, 290]);
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -109,8 +109,8 @@ h = histogram(ax, FractionOrdersBacklogged, Normalization="probability");
 
 % Add title and axis labels
 title(ax, "Fraction of Orders that get Backlogged");
-xlabel(ax, "Backlogged Orders");
-ylabel(ax, "Total Orders");
+xlabel(ax, "Fraction of Orders Backlogged");
+ylabel(ax, "Probability");
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -120,13 +120,15 @@ exportgraphics(fig, "Fraction of Orders that get Backlogged.pdf");
 
 %% Fraction of days with non-zero backlog
 
-NonZeroBacklog = zeros([NumSamples,1]);
+FractionNonZeroBacklog = zeros([NumSamples,1]);
 
 for SampleNum = 1:NumSamples
     inventory = InventorySamples{SampleNum};
-    NonZeroBacklog(SampleNum) = fraction_days_backlogged(inventory);
+    FractionNonZeroBacklog(SampleNum) = fraction_days_backlogged(inventory);
 end
 
+MeanFractionNonZeroBacklog = mean(FractionNonZeroBacklog);
+fprintf("An estimate of how often backlogs occur: every %f days\n", 1/MeanFractionNonZeroBacklog);
 
 % Make a figure with one set of axes.
 fig = figure();
@@ -134,8 +136,7 @@ t = tiledlayout(fig,1,1);
 ax = nexttile(t);
 
 % Histogram of the cost per day.
-h = histogram(ax, NonZeroBacklog, Normalization="probability", ...
-    BinWidth=5);
+h = histogram(ax, FractionNonZeroBacklog, Normalization="probability");
 
 % Add title and axis labels
 title(ax, "Fraction of Days with a Non-zero Backlog");
@@ -154,7 +155,7 @@ DelayTimeSamples = cell([NumSamples, 1]);
 
 for SampleNum = 1:NumSamples
     inventory = InventorySamples{SampleNum};
-    dt = fulfilled_order_delay_time(inventory);
+    dt = fulfilled_order_delay_times(inventory);
     DelayTimeSamples{SampleNum} = dt(dt > 0);
 end
 
@@ -166,17 +167,16 @@ t = tiledlayout(fig,1,1);
 ax = nexttile(t);
 
 % Histogram of the cost per day.
-h = histogram(ax, DelayTimes, Normalization="probability", ...
-    BinWidth=5);
+h = histogram(ax, DelayTimes, Normalization="probability");
 
 % Add title and axis labels
 title(ax, "Delay Times of Backlogged Orders");
-xlabel(ax, "Delay Times");
+xlabel(ax, "Delay Times of Backlogged Orders");
 ylabel(ax, "Probability");
 
 % Fix the axis ranges
-ylim(ax, [0, 0.5]);
-xlim(ax, [240, 290]);
+% ylim(ax, [0, 0.5]);
+% xlim(ax, [240, 290]);
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -212,8 +212,8 @@ xlabel(ax, "Units of Cereal");
 ylabel(ax, "Probability");
 
 % Fix the axis ranges
-ylim(ax, [0, 0.5]);
-xlim(ax, [240, 290]);
+% ylim(ax, [0, 0.5]);
+% xlim(ax, [240, 290]);
 
 % Wait for MATLAB to catch up.
 pause(2);
