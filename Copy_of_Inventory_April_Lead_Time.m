@@ -1,4 +1,4 @@
-classdef Inventory < handle
+classdef Copy_of_Inventory_April_Lead_Time < handle
     % Inventory Simulation of an inventory system.
     %   Simulation object that keeps track of orders, incoming material,
     %   outoing material, material on hand, and costs.
@@ -37,11 +37,11 @@ classdef Inventory < handle
 
         % RequestBatchSize - When requesting a batch of material, how many
         % units to request in a batch.
-        RequestBatchSize = 758;
+        RequestBatchSize = 200;
 
         % ReorderPoint - When the amount of material on hand drops to this
         % many units, request another batch.
-        ReorderPoint = 180;
+        ReorderPoint = 50;
 
         % RequestLeadTime - When a batch is requested, it will be this
         % many time step before the batch arrives.
@@ -269,7 +269,7 @@ classdef Inventory < handle
             tb = total_backlog(obj);
             obj.Log(end+1, :) = {obj.Time, obj.OnHand, tb, obj.RunningCost};
         end
-% fulfilled order delays
+
         function DelayTimes = fulfilled_order_delay_times(obj)
             % iterate over obj.Fulfilled
             NumFulfilled = length(obj.Fulfilled);
@@ -279,7 +279,7 @@ classdef Inventory < handle
                 x = obj.Fulfilled{j};
                 DelayTimes(j) = x.Time - x.OriginalTime;
 
-            end 
+            end
 
         end
 
@@ -298,15 +298,15 @@ classdef Inventory < handle
         end
 
         function frac = fraction_days_backlogged(obj)
-            NDays = height(obj.Log);
-            BackloggedDay = 0;
+            NDays = length(obj.Log);
+            NBacklogged = 0;
             for j = 1:NDays
                 x = obj.Log.Backlog(j);
                 if x > 0
-                    BackloggedDay = BackloggedDay + 1;
+                    NBacklogged = NBacklogged + 1;
                 end
             end
-            frac = BackloggedDay / NDays;
+            frac = NBacklogged / NDays;
         end 
 
     end
