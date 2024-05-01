@@ -41,7 +41,7 @@ classdef Inventory < handle
 
         % ReorderPoint - When the amount of material on hand drops to this
         % many units, request another batch.
-        ReorderPoint = 141;
+        ReorderPoint = 180;
 
         % RequestLeadTime - When a batch is requested, it will be this
         % many time step before the batch arrives.
@@ -197,8 +197,19 @@ classdef Inventory < handle
                 order_cost = obj.RequestCostPerBatch ...
                     + obj.RequestBatchSize * obj.RequestCostPerUnit;
                 obj.RunningCost = obj.RunningCost + order_cost;
+                 
+                LeadTimeProbability = rand();
+                if LeadTimeProbability <= 0.1
+	                AprilLeadTime = 2;
+                elseif LeadTimeProbability <= 0.3
+                    AprilLeadTime = 3;
+                elseif LeadTimeProbability <= 0.7
+	                AprilLeadTime = 4;
+                else 
+                    AprilLeadTime = 5;
+                end
                 arrival = ShipmentArrival( ...
-                    Time=floor(obj.Time+obj.RequestLeadTime), ...
+                    Time=floor(obj.Time+AprilLeadTime), ...
                     Amount=obj.RequestBatchSize);
                 schedule_event(obj, arrival);
                 obj.RequestPlaced = true;
@@ -288,14 +299,14 @@ classdef Inventory < handle
 
         function frac = fraction_days_backlogged(obj)
             NDays = height(obj.Log);
-            NBacklogged = 0;
+            BackloggedDay = 0;
             for j = 1:NDays
                 x = obj.Log.Backlog(j);
                 if x > 0
-                    NBacklogged = NBacklogged + 1;
+                    BackloggedDay = BackloggedDay + 1;
                 end
             end
-            frac = NBacklogged / NDays;
+            frac = BackloggedDay / NDays;
         end 
 
     end

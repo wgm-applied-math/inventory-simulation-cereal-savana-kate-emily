@@ -8,16 +8,16 @@
 K = 25.00;
 
 % Per-unit production cost.
-c = 3.00;
+c = 3.0;
 
 % Lead time for production requests.
-L = 2;
+L = rand();
 
 % Holding cost per unit per day.
 h = 0.05/7;
 
 % Reorder point.
-ROP = 141;
+ROP = 180;
 
 % Batch size.
 Q = 758;
@@ -76,13 +76,13 @@ h = histogram(ax, TotalCosts/MaxTime, Normalization="probability", ...
     BinWidth=5);
 
 % Add title and axis labels
-title(ax, "Daily total cost");
+title(ax, "Daily total cost)");
 xlabel(ax, "Dollars");
 ylabel(ax, "Probability");
 
 % Fix the axis ranges
 % ylim(ax, [0, 0.5]);
-% xlim(ax, [240, 290]);
+% xlim(ax, [240, 265]);
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -111,6 +111,11 @@ h = histogram(ax, FractionOrdersBacklogged, Normalization="probability");
 title(ax, "Fraction of Orders that get Backlogged");
 xlabel(ax, "Fraction of Orders Backlogged");
 ylabel(ax, "Probability");
+
+% Fix the axis ranges
+% ylim(ax, [0, 0.4]);
+% xlim(ax, [0.016, 0.23]);
+
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -142,6 +147,11 @@ h = histogram(ax, FractionNonZeroBacklog, Normalization="probability");
 title(ax, "Fraction of Days with a Non-zero Backlog");
 xlabel(ax, "Fraction of Days with Non-zero Backlog");
 ylabel(ax, "Probability");
+
+% Fix the axis ranges
+% ylim(ax, [0, 0.4]);
+% xlim(ax, [0.01, 0.22]);
+
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -175,8 +185,8 @@ xlabel(ax, "Delay Times of Backlogged Orders");
 ylabel(ax, "Probability");
 
 % Fix the axis ranges
-% ylim(ax, [0, 0.5]);
-% xlim(ax, [240, 290]);
+% ylim(ax, [0, 0.12]);
+% xlim(ax, [0, 4]);
 
 % Wait for MATLAB to catch up.
 pause(2);
@@ -212,8 +222,8 @@ xlabel(ax, "Units of Cereal");
 ylabel(ax, "Probability");
 
 % Fix the axis ranges
-% ylim(ax, [0, 0.5]);
-% xlim(ax, [240, 290]);
+% ylim(ax, [0, 0.13]);
+% xlim(ax, [0, 400]);
 
 % Wait for MATLAB to catch up.
 pause(2);

@@ -203,7 +203,7 @@ classdef Copy_of_Inventory_April_Lead_Time < handle
 	                AprilLeadTime = 2;
                 elseif LeadTimeProbability <= 0.3
                     AprilLeadTime = 3;
-                elseif LeadTimeProbabillity <= 0.7
+                elseif LeadTimeProbability <= 0.7
 	                AprilLeadTime = 4;
                 else 
                     AprilLeadTime = 5;
